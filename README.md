@@ -1,4 +1,10 @@
 # Adaptive Learning Platform (DSA Project)
+<!-- Badges -->
+![Build Status](https://github.com/avkbsurya119/adaptive-learning-platform/actions/workflows/ci.yml/badge.svg)
+![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v1.json)
+![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 A Python-based **customised learning experience platform for adaptive education**, built as a Data Structures & Algorithms project.
 
