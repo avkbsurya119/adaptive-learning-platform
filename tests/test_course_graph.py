@@ -86,7 +86,12 @@ def test_topological_sort_valid_order():
     assert order.index("algorithms") < order.index("advanced_programming")
     # math can be anywhere, but must be present
     assert "discrete_math" in order
-    assert set(order) == {"data_structures", "algorithms", "advanced_programming", "discrete_math"}
+    assert set(order) == {
+        "data_structures",
+        "algorithms",
+        "advanced_programming",
+        "discrete_math",
+    }
 
 
 def test_topological_sort_cycle_detection():

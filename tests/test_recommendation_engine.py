@@ -59,8 +59,12 @@ def test_progress_gap_affects_score():
     student = Student(id="S1", name="A", age=20, gender="F")
 
     c = Course(id="test", title="Test", description="d", difficulty=2)
-    c.add_sequence(Sequence(id="s1", title="Seq1", duration=timedelta(hours=1), order=1))
-    c.add_sequence(Sequence(id="s2", title="Seq2", duration=timedelta(hours=1), order=2))
+    c.add_sequence(
+        Sequence(id="s1", title="Seq1", duration=timedelta(hours=1), order=1)
+    )
+    c.add_sequence(
+        Sequence(id="s2", title="Seq2", duration=timedelta(hours=1), order=2)
+    )
 
     # Student completes 1 of 2 sequences
     student.completed_sequences.add("s1")

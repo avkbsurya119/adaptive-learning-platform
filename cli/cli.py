@@ -208,7 +208,9 @@ class LearningPlatformCLI:
         # Check prerequisites
         prereqs = self.course_graph.find_all_prerequisites(course_id)
         missing = [
-            cid for cid in prereqs if not self._has_completed_any_sequence_in_course(student, cid)
+            cid
+            for cid in prereqs
+            if not self._has_completed_any_sequence_in_course(student, cid)
         ]
         if missing:
             print(
@@ -219,7 +221,9 @@ class LearningPlatformCLI:
         student.change_current_course(course_id)
         print(f"Student {student.id} is now focusing on course '{course_id}'.")
 
-    def _has_completed_any_sequence_in_course(self, student: Student, course_id: str) -> bool:
+    def _has_completed_any_sequence_in_course(
+        self, student: Student, course_id: str
+    ) -> bool:
         course = self.courses.get(course_id)
         if not course:
             return False
@@ -251,7 +255,9 @@ class LearningPlatformCLI:
 
         # Simple score: length of sequence_id * 10 (just to have deterministic scores)
         score = len(sequence_id) * 10
-        student.update_progress(course_id=course_id, sequence_id=sequence_id, score=score)
+        student.update_progress(
+            course_id=course_id, sequence_id=sequence_id, score=score
+        )
 
         print(
             f"Sequence '{sequence_id}' completed with score {score}. "

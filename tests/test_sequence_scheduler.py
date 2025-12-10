@@ -29,7 +29,11 @@ def test_fifo_with_same_priority():
     scheduler.schedule(t3)
 
     # Same priority => should come out in insertion order
-    order = [scheduler.dequeue_next(), scheduler.dequeue_next(), scheduler.dequeue_next()]
+    order = [
+        scheduler.dequeue_next(),
+        scheduler.dequeue_next(),
+        scheduler.dequeue_next(),
+    ]
     ids = [(t.course_id, t.sequence_id) for t in order]
 
     assert ids == [
@@ -43,7 +47,7 @@ def test_lower_priority_number_runs_first():
     scheduler = SequenceScheduler()
 
     high = make_task("advanced_programming", "seq1", priority=3)  # lower priority
-    low = make_task("data_structures", "seq1", priority=1)        # higher priority
+    low = make_task("data_structures", "seq1", priority=1)  # higher priority
 
     scheduler.schedule(high)
     scheduler.schedule(low)

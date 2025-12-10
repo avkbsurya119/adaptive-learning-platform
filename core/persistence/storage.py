@@ -14,6 +14,7 @@ from core.models.sequence import Sequence
 # Helper: Convert Student to dict
 # ---------------------------------------------------------------
 
+
 def student_to_dict(student: Student) -> dict:
     return {
         "id": student.id,
@@ -62,6 +63,7 @@ def student_from_dict(data: dict) -> Student:
 # Helper: Convert Course to dict
 # ---------------------------------------------------------------
 
+
 def course_to_dict(course: Course) -> dict:
     return {
         "id": course.id,
@@ -103,6 +105,7 @@ def course_from_dict(data: dict) -> Course:
 # Persistence API
 # ---------------------------------------------------------------
 
+
 def save_students(path: str, students: Dict[str, Student]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     payload = {sid: student_to_dict(stu) for sid, stu in students.items()}
@@ -140,6 +143,7 @@ def load_courses(path: str) -> Dict[str, Course]:
 # ---------------------------------------------------------------
 # Seed data
 # ---------------------------------------------------------------
+
 
 def seed_example_data() -> Dict[str, Course]:
     """Creates a small course dictionary for demos."""
