@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Optional
 
 from core.graph.course_graph import CourseGraph
-from core.models.course import Course
 from core.models.student import Student
 from core.recommendations.recommendation_engine import RecommendationEngine
 from core.scheduling.sequence_scheduler import SequenceScheduler, SequenceTask
 from core.search.trie import ContentTrie
-from core.persistence.storage import seed_example_data, save_students, load_students
-
+from core.persistence.storage import seed_example_data
+from core.students.student_service import StudentService
 
 STUDENT_STORAGE_PATH = "data/students.json"
 
@@ -25,7 +24,7 @@ class LearningPlatformCLI:
     - Enroll in courses
     - Complete sequences (using the scheduler)
     - View history
-    - Get recommendations
+    - Get course recommendations
     """
 
     def __init__(self) -> None:
@@ -35,13 +34,12 @@ class LearningPlatformCLI:
         self.scheduler = SequenceScheduler()
         self.recommendation_engine = RecommendationEngine()
 
-        # In-memory student registry
-        self.students: Dict[str, Student] = {}
+        # Student service (wraps dict + persistence)
+        self.student_service = StudentService(STUDENT_STORAGE_PATH)
 
         # Load initial data
-        self.courses: Dict[str, Course] = seed_example_data()
+        self.courses = seed_example_data()
         self._init_courses()
-        self._load_students()
 
     # ------------------------------------------------------------------ #
     # Initialization helpers
@@ -49,12 +47,10 @@ class LearningPlatformCLI:
 
     def _init_courses(self) -> None:
         """Register courses in graph, fill Trie and schedule all sequences."""
-        # Example prerequisites mapping:
-        # data_structures -> algorithms
+        # Example prerequisites mapping: data_structures -> algorithms
+        prereq_map: list[tuple[str, str]] = []
         if "data_structures" in self.courses and "algorithms" in self.courses:
-            prereq_map = [("data_structures", "algorithms")]
-        else:
-            prereq_map = []
+            prereq_map.append(("data_structures", "algorithms"))
 
         for course in self.courses.values():
             self.course_graph.add_course(course)
@@ -67,7 +63,7 @@ class LearningPlatformCLI:
             # Schedule all sequences with priority based on difficulty
             for seq in course.sequences:
                 task = SequenceTask(
-                    priority=course.difficulty,  # lower difficulty => higher priority
+                    priority=course.difficulty,
                     course_id=course.id,
                     sequence_id=seq.id,
                     duration=seq.duration,
@@ -78,18 +74,6 @@ class LearningPlatformCLI:
         for prereq, course_id in prereq_map:
             if prereq in self.courses and course_id in self.courses:
                 self.course_graph.add_prerequisite(prereq, course_id)
-
-    def _load_students(self) -> None:
-        """Load students from JSON storage if available."""
-        try:
-            self.students = load_students(STUDENT_STORAGE_PATH)
-        except Exception:
-            # For demo purposes, ignore load failures
-            self.students = {}
-
-    def _save_students(self) -> None:
-        """Persist students to JSON storage."""
-        save_students(STUDENT_STORAGE_PATH, self.students)
 
     # ------------------------------------------------------------------ #
     # CLI Loop
@@ -125,7 +109,7 @@ class LearningPlatformCLI:
             elif choice == "7":
                 self._show_recommendations()
             elif choice == "8":
-                self._save_students()
+                self.student_service.save()
                 print("Data saved. Goodbye!")
                 break
             else:
@@ -141,7 +125,7 @@ class LearningPlatformCLI:
             print("Student ID cannot be empty.")
             return
 
-        if student_id in self.students:
+        if self.student_service.exists(student_id):
             print("A student with that ID already exists.")
             return
 
@@ -156,7 +140,7 @@ class LearningPlatformCLI:
             return
 
         student = Student(id=student_id, name=name, age=age, gender=gender)
-        self.students[student_id] = student
+        self.student_service.add_student(student)
         print(f"Registered student {student_id} - {name}")
 
     def _list_courses(self) -> None:
@@ -185,7 +169,7 @@ class LearningPlatformCLI:
 
     def _get_student_by_prompt(self) -> Optional[Student]:
         student_id = input("Enter student ID: ").strip()
-        student = self.students.get(student_id)
+        student = self.student_service.get_student(student_id)
         if not student:
             print("Student not found.")
             return None
@@ -212,15 +196,17 @@ class LearningPlatformCLI:
         ]
         if missing:
             print(
-                "Warning: student has not completed any sequences in prerequisite courses: "
-                + ", ".join(missing)
+                "Warning: student has not completed any sequences in prerequisite"
+                " courses: " + ", ".join(missing)
             )
 
         student.change_current_course(course_id)
         print(f"Student {student.id} is now focusing on course '{course_id}'.")
 
     def _has_completed_any_sequence_in_course(
-        self, student: Student, course_id: str
+        self,
+        student: Student,
+        course_id: str,
     ) -> bool:
         course = self.courses.get(course_id)
         if not course:
@@ -242,7 +228,6 @@ class LearningPlatformCLI:
             print("No remaining scheduled sequences for this course.")
             return
 
-        # Simulate completion and a basic quiz score
         course_id = next_task.course_id
         sequence_id = next_task.sequence_id
 
@@ -251,10 +236,12 @@ class LearningPlatformCLI:
             f"(estimated duration={next_task.duration})."
         )
 
-        # Simple score: length of sequence_id * 10 (just to have deterministic scores)
+        # Simple deterministic score: length of sequence_id * 10
         score = len(sequence_id) * 10
         student.update_progress(
-            course_id=course_id, sequence_id=sequence_id, score=score
+            course_id=course_id,
+            sequence_id=sequence_id,
+            score=score,
         )
 
         print(
@@ -267,9 +254,6 @@ class LearningPlatformCLI:
         Dequeue the next SequenceTask for the given course_id
         while preserving the schedule for other courses.
         """
-        # Strategy:
-        # - Pop tasks until we find one for this course or heap is empty.
-        # - Temporarily store others and push them back.
         temp: list[SequenceTask] = []
         selected: Optional[SequenceTask] = None
 
@@ -280,9 +264,8 @@ class LearningPlatformCLI:
                 break
             temp.append(task)
 
-        # Push back other tasks
-        for t in temp:
-            self.scheduler.schedule(t)
+        for task in temp:
+            self.scheduler.schedule(task)
 
         return selected
 
@@ -305,7 +288,11 @@ class LearningPlatformCLI:
         if not student:
             return
 
-        recs = self.recommendation_engine.recommend_for(student, self.courses, top_n=5)
+        recs = self.recommendation_engine.recommend_for(
+            student,
+            self.courses,
+            top_n=5,
+        )
         print(f"\nRecommendations for {student.id} - {student.name}:")
         for item in recs:
             course = self.courses[item.course_id]
