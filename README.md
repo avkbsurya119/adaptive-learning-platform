@@ -128,5 +128,4 @@ adaptive-learning-platform/
 ├─ LICENSE
 ├─ requirements.txt
 ├─ pytest.ini
-├─ .pre-commit-config.yaml     # (optional)
 └─ .gitignore
