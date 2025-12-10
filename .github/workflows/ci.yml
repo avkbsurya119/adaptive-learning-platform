@@ -28,11 +28,10 @@ jobs:
         run: |
           black .
 
-
       - name: Run ruff (lint)
         run: |
-          ruff .
-
+          ruff check .
+          
       - name: Run tests
         run: |
           pytest -q
