@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from typing import Dict, Optional
 
 from core.graph.course_graph import CourseGraph
 from core.models.course import Course
-from core.models.sequence import Sequence
 from core.models.student import Student
 from core.recommendations.recommendation_engine import RecommendationEngine
 from core.scheduling.sequence_scheduler import SequenceScheduler, SequenceTask

@@ -1,5 +1,4 @@
-import os
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from core.persistence.storage import (
     save_students,

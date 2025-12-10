@@ -1,5 +1,4 @@
 from core.models.student import Student
-from core.history.history import StudentHistory
 
 
 def test_student_update_progress_increments_once_per_sequence():

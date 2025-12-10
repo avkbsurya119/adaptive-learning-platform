@@ -1,4 +1,3 @@
-import pytest
 
 from core.search.trie import ContentTrie
 

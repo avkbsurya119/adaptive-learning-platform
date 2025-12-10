@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict
 
 from core.models.student import Student
 from core.models.course import Course
