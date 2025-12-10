@@ -24,14 +24,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Optional: auto-format with black (does NOT fail the build)
       - name: Run black (auto format)
         run: |
           black .
 
+      # Lint with Ruff using new CLI
       - name: Run ruff (lint)
         run: |
           ruff check .
-          
+
+      # Run tests
       - name: Run tests
         run: |
           pytest -q
