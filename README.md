@@ -1,79 +1,85 @@
 # Adaptive Learning Platform (DSA Project)
-<!-- Badges -->
+
 ![Build Status](https://github.com/avkbsurya119/adaptive-learning-platform/actions/workflows/ci.yml/badge.svg)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v1.json)
+![Ruff](https://img.shields.io/badge/ruff-checked-brightgreen)
 ![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
-A Python-based **customised learning experience platform for adaptive education**, built as a Data Structures & Algorithms project.
+A modular, test-driven **Adaptive Learning Platform** built using classical **Data Structures & Algorithms (DSA)**.  
+The system simulates how a real-world intelligent learning platform works—using data structures like Trie, Graph, Priority Queue, Array, and HashMap to power search, sequencing, history, and recommendations.
 
-It demonstrates how core ADTs can be combined to power a small “learning platform”:
-
-- **Trie** – fast content search/autocomplete
-- **Graph** – course prerequisites using a CourseGraph
-- **Queue / Heap** – sequence scheduling with priorities
-- **HashMap** – student registry (`dict` keyed by student id)
-- **Array** – student activity history using an index + list
-- **Recommendation system** – deterministic scoring using a heap-like ordering
-
-This repo is designed to be:
-
-- **Cleanly architected** – core logic separated from CLI
-- **Tested** – pytest coverage for all core components
-- **GitHub-ready** – CI workflow, clear structure, docs, and licensing
+This project demonstrates clean architecture, modern Python practices, and full automated testing suitable for academic submission and professional portfolios.
 
 ---
 
-## 🔧 Features
+## 📚 Features at a Glance
 
-- **Trie-based content search**
-  - Insert course titles and sequence titles
-  - Case-insensitive autocomplete for prefixes
+### 🔍 Trie-Based Content Search
+Fast prefix-based search for:
+- Course titles  
+- Sequence titles  
 
-- **CourseGraph with prerequisites**
-  - Directed acyclic graph of courses
-  - Maintains both:
-    - `graph`: `prereq → [dependents]`
-    - `reverse_graph`: `course → [prereqs]`
-  - Topological sort (non-destructive)
-  - Direct and transitive prerequisite queries
+Used for autocomplete and content discovery.
 
-- **Sequence scheduler**
-  - Schedules course sequences using a priority queue
-  - Lower numeric priority = higher actual priority
-  - Stable ordering (FIFO when priority is equal)
+### 🔗 Graph-Based Course Prerequisites
+Courses and their prerequisites are stored as a **Directed Acyclic Graph (DAG)**:
+- Add courses  
+- Add prerequisites  
+- Retrieve direct and indirect prerequisites  
+- Perform topological sorting  
 
-- **Student & history tracking**
-  - Student profile with:
-    - current course
-    - completed sequences
-    - progress counter
-  - History backed by:
-    - `array('I')` index
-    - list of Activity objects
-  - Logs sequence completions and quiz scores
+### 🧵 Priority Sequence Scheduler
+Sequences are scheduled using a **min-heap** priority queue:
+- Lower priority = executed earlier  
+- Stable ordering (FIFO for equal priority)  
+- Students progress step-by-step  
 
-- **Recommendation engine**
-  - Deterministic scoring (no randomness)
-  - Factors:
-    - progress gap (how much is left to learn)
-    - difficulty match
-    - recency of activity
-  - Returns ranked recommendations with human-readable explanations
+### 📜 Student History (Array-Backed)
+Logs activities using:
+- Array indexes  
+- Activity objects  
 
-- **CLI demo**
-  - Register students
-  - List courses and prerequisites
-  - Search content
-  - Enroll a student in a course
-  - Complete sequences (scheduled)
-  - View student history
-  - Get course recommendations
+Tracks:
+- Completed sequences  
+- Quiz scores  
+- Timestamps  
+
+### 🎯 Deterministic Recommendation Engine
+Ranks the next best courses using:
+- Difficulty alignment  
+- Progress gap  
+- Recency of learning  
+
+Provides **explanation strings** for transparency.
+
+### 💻 CLI Demo
+A full menu-driven CLI to interact with the system:
+- Register students  
+- Search content  
+- Enroll in a course  
+- Complete sequences  
+- View history  
+- Generate recommendations  
 
 ---
 
-## 📁 Project Structure
+## 🧠 DSA Concepts Used
+
+| Feature | Data Structure | File |
+|--------|----------------|------|
+| Content Search | Trie | `core/search/trie.py` |
+| Course Prerequisites | Directed Graph | `core/graph/course_graph.py` |
+| Sequence Scheduling | Min-Heap | `core/scheduling/sequence_scheduler.py` |
+| Student Registry | HashMap (Dict) | `core/models/student.py` |
+| Activity History | Array | `core/history/history.py` |
+| Recommendations | Weighted Scoring + Sorting | `core/recommendations/recommendation_engine.py` |
+
+---
+
+## 🗂️ Project Structure
+
+
 
 ```text
 adaptive-learning-platform/
@@ -93,13 +99,13 @@ adaptive-learning-platform/
 │  ├─ history/
 │  │  └─ history.py
 │  ├─ students/
-│  │  └─ student_service.py   # (optional / future extension)
+│  │  └─ student_service.py 
 │  ├─ recommendations/
 │  │  └─ recommendation_engine.py
 │  ├─ persistence/
 │  │  └─ storage.py
-│  ├─ config.py               # (optional / future extension)
-│  └─ logging_config.py       # (optional / future extension)
+│  ├─ config.py           
+│  └─ logging_config.py      
 ├─ cli/
 │  └─ cli.py
 ├─ tests/
@@ -112,9 +118,8 @@ adaptive-learning-platform/
 │  ├─ test_storage.py
 │  └─ test_integration_flow.py
 ├─ docs/
-│  ├─ 23cse203-data-structures-and-algorithm.pdf
-│  ├─ architecture.md          # (optional / future extension)
-│  └─ api_examples.md          # (optional / future extension)
+│  ├─ architecture.md     
+│  └─ api_examples.md         
 ├─ .github/
 │  └─ workflows/
 │     └─ ci.yml
